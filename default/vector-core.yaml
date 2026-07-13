@@ -1,0 +1,10 @@
+ensureCollectionsOnBoot: true
+runMigrationsOnBoot: true
+collectionPrefix: ''
+defaultSearchLimit: 10
+connection:
+  host: 127.0.0.1
+  port: 6333
+  https: false
+  apiKey: ''
+  timeoutMs: 30000
