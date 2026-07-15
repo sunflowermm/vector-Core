@@ -42,6 +42,7 @@ vector-Core 为 XRK-AGT 提供基于 Qdrant 的向量集合管理、写入与相
 cd XRK-AGT/core
 git clone https://github.com/sunflowermm/vector-Core.git vector-Core
 cd ..
+pnpm install
 node app
 ```
 

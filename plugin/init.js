@@ -1,9 +1,9 @@
-import plugin from '#infrastructure/plugins/plugin.js';
-import { setRuntimeGlobal } from '#utils/runtime-globals.js';
-import { normalizeError } from '#utils/normalize-error.js';
+import PluginBase from '../../../src/infrastructure/plugins/plugin-base.js';
+import { setRuntimeGlobal } from '../../../src/utils/runtime-globals.js';
+import { normalizeError } from '../../../src/utils/normalize-error.js';
 import * as VectorService from '../lib/index.js';
 
-export default class VectorCoreInit extends plugin {
+export default class VectorCoreInit extends PluginBase {
   constructor() {
     super({
       name: 'vector-core-init',
