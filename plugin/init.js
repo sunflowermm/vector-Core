@@ -1,13 +1,18 @@
+/**
+ * vector-Core 启动：bootstrap + 注册 Qdrant 可选持久化探活
+ * 连接失败时 soft-skip，不阻断 Runtime。
+ */
 import PluginBase from '../../../src/infrastructure/plugins/plugin-base.js';
 import { setRuntimeGlobal } from '../../../src/utils/runtime-globals.js';
 import { normalizeError } from '../../../src/utils/normalize-error.js';
+import { registerPersistenceProvider } from '../../../src/infrastructure/database/persistence-registry.js';
 import * as VectorService from '../lib/index.js';
 
 export default class VectorCoreInit extends PluginBase {
   constructor() {
     super({
       name: 'vector-core-init',
-      dsc: 'Vector-Core 启动：Qdrant 集合、迁移、挂载 VectorService',
+      dsc: 'vector-Core bootstrap',
       event: 'message',
       priority: 1,
     });
@@ -17,13 +22,24 @@ export default class VectorCoreInit extends PluginBase {
     if (VectorCoreInit._booted) return;
     VectorCoreInit._booted = true;
     try {
-      const result = await VectorService.bootstrap();
+      await VectorService.bootstrap();
       setRuntimeGlobal('VectorService', VectorService);
-      const mig = result.migrations?.length ? result.migrations.join(',') : 'none';
-      logger.mark(`[vector-Core] bootstrap OK migrations=[${mig}]`);
+      registerPersistenceProvider({
+        id: 'qdrant',
+        kind: 'vector',
+        required: false,
+        core: 'vector-Core',
+        ping: () => VectorService.ping(),
+      });
     } catch (err) {
-      const error = normalizeError(err);
-      logger.warn(`[vector-Core] bootstrap 跳过: ${error.message}`);
+      registerPersistenceProvider({
+        id: 'qdrant',
+        kind: 'vector',
+        required: false,
+        core: 'vector-Core',
+        ping: async () => false,
+        meta: { skipReason: normalizeError(err).message },
+      });
     }
   }
 }
